@@ -61,3 +61,4 @@ lefthook-local.yml
 .playwright-mcp
 .n8n
 .superset
+.conductor
