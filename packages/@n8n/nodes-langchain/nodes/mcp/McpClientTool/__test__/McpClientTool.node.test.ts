@@ -16,6 +16,7 @@ import { proxyFetch } from '@n8n/ai-utilities';
 
 import { getTools } from '../loadOptions';
 import { McpClientTool } from '../McpClientTool.node';
+import { buildMcpToolName } from '../utils';
 
 jest.mock('@modelcontextprotocol/sdk/client/sse.js');
 jest.mock('@modelcontextprotocol/sdk/client/index.js');
@@ -91,7 +92,7 @@ describe('McpClientTool', () => {
 
 			const supplyDataResult = await new McpClientTool().supplyData.call(
 				mock<ISupplyDataFunctions>({
-					getNode: jest.fn(() => mock<INode>({ typeVersion: 1 })),
+					getNode: jest.fn(() => mock<INode>({ typeVersion: 1, name: 'MCP Client' })),
 					logger: { debug: jest.fn(), error: jest.fn() },
 					addInputData: jest.fn(() => ({ index: 0 })),
 				}),
@@ -130,6 +131,7 @@ describe('McpClientTool', () => {
 					getNode: jest.fn(() =>
 						mock<INode>({
 							typeVersion: 1,
+							name: 'MCP Client',
 						}),
 					),
 					getNodeParameter: jest.fn((key, _index) => {
@@ -150,7 +152,7 @@ describe('McpClientTool', () => {
 
 			const tools = (supplyDataResult.response as StructuredToolkit).getTools();
 			expect(tools).toHaveLength(1);
-			expect(tools[0].name).toBe('MyTool2');
+			expect(tools[0].name).toBe(buildMcpToolName('MCP Client', 'MyTool2'));
 		});
 
 		it('should support selecting tools to exclude', async () => {
@@ -175,6 +177,7 @@ describe('McpClientTool', () => {
 					getNode: jest.fn(() =>
 						mock<INode>({
 							typeVersion: 1,
+							name: 'MCP Client',
 						}),
 					),
 					getNodeParameter: jest.fn((key, _index) => {
@@ -195,7 +198,7 @@ describe('McpClientTool', () => {
 
 			const tools = (supplyDataResult.response as StructuredToolkit).getTools();
 			expect(tools).toHaveLength(1);
-			expect(tools[0].name).toBe('MyTool1');
+			expect(tools[0].name).toBe(buildMcpToolName('MCP Client', 'MyTool1'));
 		});
 
 		it('should support header auth', async () => {
@@ -214,7 +217,7 @@ describe('McpClientTool', () => {
 
 			const supplyDataResult = await new McpClientTool().supplyData.call(
 				mock<ISupplyDataFunctions>({
-					getNode: jest.fn(() => mock<INode>({ typeVersion: 1 })),
+					getNode: jest.fn(() => mock<INode>({ typeVersion: 1, name: 'MCP Client' })),
 					getNodeParameter: jest.fn((key, _index) => {
 						const parameters: Record<string, any> = {
 							include: 'except',
@@ -265,7 +268,7 @@ describe('McpClientTool', () => {
 
 			const supplyDataResult = await new McpClientTool().supplyData.call(
 				mock<ISupplyDataFunctions>({
-					getNode: jest.fn(() => mock<INode>({ typeVersion: 1 })),
+					getNode: jest.fn(() => mock<INode>({ typeVersion: 1, name: 'MCP Client' })),
 					getNodeParameter: jest.fn((key, _index) => {
 						const parameters: Record<string, any> = {
 							include: 'except',
@@ -320,6 +323,7 @@ describe('McpClientTool', () => {
 					getNode: jest.fn(() =>
 						mock<INode>({
 							typeVersion: 1,
+							name: 'MCP Client',
 						}),
 					),
 					logger: { debug: jest.fn(), error: jest.fn() },
@@ -357,6 +361,7 @@ describe('McpClientTool', () => {
 				getNode: jest.fn(() =>
 					mock<INode>({
 						typeVersion: 1,
+						name: 'MCP Client',
 					}),
 				),
 				logger: { debug: jest.fn(), error: jest.fn() },
@@ -394,7 +399,7 @@ describe('McpClientTool', () => {
 				],
 			});
 
-			const mockNode = mock<INode>({ typeVersion: 1 });
+			const mockNode = mock<INode>({ typeVersion: 1, name: 'MCP Client' });
 			const supplyDataResult = await new McpClientTool().supplyData.call(
 				mock<ISupplyDataFunctions>({
 					getNode: jest.fn(() => mockNode),
@@ -446,13 +451,13 @@ describe('McpClientTool', () => {
 				],
 			});
 
-			const mockNode = mock<INode>({ typeVersion: 1, type: 'mcpClientTool' });
+			const mockNode = mock<INode>({ typeVersion: 1, type: 'mcpClientTool', name: 'MCP Client' });
 			const mockExecuteFunctions = mock<any>({
 				getNode: jest.fn(() => mockNode),
 				getInputData: jest.fn(() => [
 					{
 						json: {
-							tool: 'get_weather',
+							tool: buildMcpToolName('MCP Client', 'get_weather'),
 							location: 'Berlin',
 						},
 					},
@@ -514,13 +519,13 @@ describe('McpClientTool', () => {
 					],
 				});
 
-				const mockNode = mock<INode>({ typeVersion: 1, type: 'mcpClientTool' });
+				const mockNode = mock<INode>({ typeVersion: 1, type: 'mcpClientTool', name: 'MCP Client' });
 				const mockExecuteFunctions = mock<any>({
 					getNode: jest.fn(() => mockNode),
 					getInputData: jest.fn(() => [
 						{
 							json: {
-								tool: 'get_weather',
+								tool: buildMcpToolName('MCP Client', 'get_weather'),
 								location: 'Berlin',
 								foo: 'bar',
 								sessionId: '123',
@@ -579,13 +584,13 @@ describe('McpClientTool', () => {
 				],
 			});
 
-			const mockNode = mock<INode>({ typeVersion: 1, type: 'mcpClientTool' });
+			const mockNode = mock<INode>({ typeVersion: 1, type: 'mcpClientTool', name: 'MCP Client' });
 			const mockExecuteFunctions = mock<any>({
 				getNode: jest.fn(() => mockNode),
 				getInputData: jest.fn(() => [
 					{
 						json: {
-							tool: 'flexible_tool',
+							tool: buildMcpToolName('MCP Client', 'flexible_tool'),
 							foo: 'bar',
 							extra: 'data',
 						},
@@ -631,7 +636,7 @@ describe('McpClientTool', () => {
 				],
 			});
 
-			const mockNode = mock<INode>({ typeVersion: 1, type: 'mcpClientTool' });
+			const mockNode = mock<INode>({ typeVersion: 1, type: 'mcpClientTool', name: 'MCP Client' });
 			const mockExecuteFunctions = mock<any>({
 				getNode: jest.fn(() => mockNode),
 				getInputData: jest.fn(() => [
@@ -664,7 +669,7 @@ describe('McpClientTool', () => {
 		it('should throw error when MCP server connection fails', async () => {
 			jest.spyOn(Client.prototype, 'connect').mockRejectedValue(new Error('Connection failed'));
 
-			const mockNode = mock<INode>({ typeVersion: 1, type: 'mcpClientTool' });
+			const mockNode = mock<INode>({ typeVersion: 1, type: 'mcpClientTool', name: 'MCP Client' });
 			const mockExecuteFunctions = mock<any>({
 				getNode: jest.fn(() => mockNode),
 				getInputData: jest.fn(() => [
@@ -713,19 +718,19 @@ describe('McpClientTool', () => {
 				],
 			});
 
-			const mockNode = mock<INode>({ typeVersion: 1, type: 'mcpClientTool' });
+			const mockNode = mock<INode>({ typeVersion: 1, type: 'mcpClientTool', name: 'MCP Client' });
 			const mockExecuteFunctions = mock<any>({
 				getNode: jest.fn(() => mockNode),
 				getInputData: jest.fn(() => [
 					{
 						json: {
-							tool: 'get_weather',
+							tool: buildMcpToolName('MCP Client', 'get_weather'),
 							location: 'Berlin',
 						},
 					},
 					{
 						json: {
-							tool: 'get_weather',
+							tool: buildMcpToolName('MCP Client', 'get_weather'),
 							location: 'London',
 						},
 					},
@@ -785,13 +790,13 @@ describe('McpClientTool', () => {
 				],
 			});
 
-			const mockNode = mock<INode>({ typeVersion: 1, type: 'mcpClientTool' });
+			const mockNode = mock<INode>({ typeVersion: 1, type: 'mcpClientTool', name: 'MCP Client' });
 			const mockExecuteFunctions = mock<any>({
 				getNode: jest.fn(() => mockNode),
 				getInputData: jest.fn(() => [
 					{
 						json: {
-							tool: 'get_weather',
+							tool: buildMcpToolName('MCP Client', 'get_weather'),
 							location: 'Berlin',
 						},
 					},
@@ -815,6 +820,64 @@ describe('McpClientTool', () => {
 			expect(result[0][0].json.response).toEqual([{ type: 'text', text: 'Weather is sunny' }]);
 		});
 
+		it('should call MCP server with original unprefixed tool name', async () => {
+			jest.spyOn(Client.prototype, 'connect').mockResolvedValue();
+			jest.spyOn(Client.prototype, 'callTool').mockResolvedValue({
+				content: [{ type: 'text', text: 'Weather is sunny' }],
+			});
+			jest.spyOn(Client.prototype, 'listTools').mockResolvedValue({
+				tools: [
+					{
+						name: 'get_weather',
+						description: 'Gets the weather',
+						inputSchema: {
+							type: 'object',
+							properties: { location: { type: 'string' } },
+						},
+					},
+				],
+			});
+
+			const mockNode = mock<INode>({
+				typeVersion: 1,
+				type: 'mcpClientTool',
+				name: 'GitHub MCP',
+			});
+			const mockExecuteFunctions = mock<any>({
+				getNode: jest.fn(() => mockNode),
+				getInputData: jest.fn(() => [
+					{
+						json: {
+							tool: buildMcpToolName('GitHub MCP', 'get_weather'),
+							location: 'Berlin',
+						},
+					},
+				]),
+				getNodeParameter: jest.fn((key) => {
+					const params: Record<string, any> = {
+						include: 'all',
+						includeTools: [],
+						excludeTools: [],
+						authentication: 'none',
+						sseEndpoint: 'https://test.com/sse',
+						'options.timeout': 60000,
+					};
+					return params[key];
+				}),
+			});
+
+			await new McpClientTool().execute.call(mockExecuteFunctions);
+
+			expect(Client.prototype.callTool).toHaveBeenCalledWith(
+				{
+					name: 'get_weather',
+					arguments: { location: 'Berlin' },
+				},
+				expect.anything(),
+				expect.anything(),
+			);
+		});
+
 		it('should execute tool with timeout', async () => {
 			jest.spyOn(Client.prototype, 'connect').mockResolvedValue();
 			jest.spyOn(Client.prototype, 'callTool').mockResolvedValue({
@@ -829,13 +892,13 @@ describe('McpClientTool', () => {
 					},
 				],
 			});
-			const mockNode = mock<INode>({ typeVersion: 1.2, type: 'mcpClientTool' });
+			const mockNode = mock<INode>({ typeVersion: 1.2, type: 'mcpClientTool', name: 'MCP Client' });
 			const mockExecuteFunctions = mockDeep<IExecuteFunctions>();
 			mockExecuteFunctions.getNode.mockReturnValue(mockNode);
 			mockExecuteFunctions.getInputData.mockReturnValue([
 				{
 					json: {
-						tool: 'get_weather',
+						tool: buildMcpToolName('MCP Client', 'get_weather'),
 						location: 'Berlin',
 					},
 				},
@@ -860,6 +923,105 @@ describe('McpClientTool', () => {
 				},
 				CallToolResultSchema,
 				{ timeout: 12345 },
+			);
+		});
+	});
+
+	describe('buildMcpToolName', () => {
+		it('should prefix tool name with sanitized server name', () => {
+			expect(buildMcpToolName('MCP Client', 'get_weather')).toBe('MCP_Client_get_weather');
+		});
+
+		it('should sanitize special characters in server name', () => {
+			expect(buildMcpToolName('GitHub MCP (v2)', 'list_repos')).toBe('GitHub_MCP__v2__list_repos');
+		});
+
+		it('should truncate prefix when total length exceeds 64 characters', () => {
+			const longToolName = 'a'.repeat(50);
+			const result = buildMcpToolName('MyServer', longToolName);
+			expect(result.length).toBeLessThanOrEqual(64);
+			expect(result).toContain(longToolName);
+		});
+
+		it('should return original tool name when it alone exceeds 64 characters', () => {
+			const longToolName = 'a'.repeat(65);
+			expect(buildMcpToolName('Server', longToolName)).toBe(longToolName);
+		});
+	});
+
+	describe('supplyData tool name prefixing', () => {
+		beforeEach(() => {
+			jest.resetAllMocks();
+		});
+
+		it('should prefix tool names with sanitized node name', async () => {
+			jest.spyOn(Client.prototype, 'connect').mockResolvedValue();
+			jest.spyOn(Client.prototype, 'listTools').mockResolvedValue({
+				tools: [
+					{
+						name: 'list_tools',
+						description: 'Lists tools',
+						inputSchema: { type: 'object', properties: {} },
+					},
+				],
+			});
+
+			const supplyDataResult = await new McpClientTool().supplyData.call(
+				mock<ISupplyDataFunctions>({
+					getNode: jest.fn(() =>
+						mock<INode>({
+							typeVersion: 1,
+							name: 'GitHub MCP',
+						}),
+					),
+					logger: { debug: jest.fn(), error: jest.fn() },
+					addInputData: jest.fn(() => ({ index: 0 })),
+				}),
+				0,
+			);
+
+			const tools = (supplyDataResult.response as StructuredToolkit).getTools();
+			expect(tools[0].name).toBe('GitHub_MCP_list_tools');
+		});
+
+		it('should call MCP server with original tool name via supplyData tools', async () => {
+			jest.spyOn(Client.prototype, 'connect').mockResolvedValue();
+			jest
+				.spyOn(Client.prototype, 'callTool')
+				.mockResolvedValue({ content: [{ type: 'text', text: 'ok' }] });
+			jest.spyOn(Client.prototype, 'listTools').mockResolvedValue({
+				tools: [
+					{
+						name: 'get_weather',
+						description: 'Gets weather',
+						inputSchema: { type: 'object', properties: { location: { type: 'string' } } },
+					},
+				],
+			});
+
+			const supplyDataResult = await new McpClientTool().supplyData.call(
+				mock<ISupplyDataFunctions>({
+					getNode: jest.fn(() =>
+						mock<INode>({
+							typeVersion: 1,
+							name: 'Weather MCP',
+						}),
+					),
+					logger: { debug: jest.fn(), error: jest.fn() },
+					addInputData: jest.fn(() => ({ index: 0 })),
+				}),
+				0,
+			);
+
+			const tools = (supplyDataResult.response as StructuredToolkit).getTools();
+			expect(tools[0].name).toBe('Weather_MCP_get_weather');
+
+			await tools[0].invoke({ location: 'Berlin' });
+
+			expect(Client.prototype.callTool).toHaveBeenCalledWith(
+				{ name: 'get_weather', arguments: { location: 'Berlin' } },
+				expect.anything(),
+				expect.anything(),
 			);
 		});
 	});
